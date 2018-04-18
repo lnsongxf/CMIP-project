@@ -11,7 +11,7 @@ nameplot = 'FPw';
 
 addpath(genpath([cd '\Codes']));
 % Graphs
-path_g       = 'C:\Users\alex.carrasco\AlexCarrasco\Proyectos\CMPI - project\Graphs';
+path_g       = [cd '\Graphs'];
 imprime      = @(x) print( gcf, '-depsc2', [path_g filesep x]);
 imprpdf      = @(x) eps2pdf( [path_g filesep x '.eps']);
 formataxis   = @(x) set(x, 'Fontname', 'Times', 'FontWeight', 'normal', 'Fontsize', 20, 'Box', 'Off', 'PlotBoxAspectRatio', [1 0.75 1]);
