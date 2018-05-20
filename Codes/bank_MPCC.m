@@ -1,11 +1,11 @@
 %% it is a shorcut for running banks commands in MPPC_generalpolicy.m
 printit = 0;
 
-i_m_ss    = -0.000;   %-0.005  ;
-isp_ss    = 0.0512;   %0.02  ;
+i_m_ss    = 0.000;   %-0.005  ;
+isp_ss    = 0.0275;   %0.02  ;
 
 % Interbank Market block
-varrho= 0.10 ; % Reserve Requirement
+varrho= 0.1 ; % Reserve Requirement
 barlam= 2.5  ; % Efficiency interbank market
 eta   = 0.5  ; % Bargaining
 omega = 0.08 ; % Average size of shock - interbank
@@ -32,10 +32,6 @@ fedeqaux  = 000        ;
 poldaux = isp_ss; % typical policy spread
 r_m_aux = i_m_ss;
 
-
-MPCC_bankblock_ii;
-
-MPPC_report_shocks;
 
 % Interbank Market Solutions
 MPCC_interbank_vecs;

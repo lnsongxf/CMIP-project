@@ -6,10 +6,10 @@ while cond>tol % value function iteration
     V_in =V;
     % Finite difference approximation
     dvF(1:end-1) = (V(2:end) - V(1:end-1))./(s_vec(2:end) - s_vec(1:end-1)); % Forward
-    dvF(N)       = (y2 + r_vec(end)*s_vec(end))^(-gamma);
+    dvF(N)       = (y2 + r_vec(end)*s_vec(end)-c_bliss)^(-gamma);
     dvB(2:end)   = (V(2:end) - V(1:end-1))./(s_vec(2:end) - s_vec(1:end-1)); % Backward
-    dvB(1)       = (y1 + r_vec(1)*s_vec(1))^(-gamma);
-    
+    dvB(1)       = (y1 + r_vec(1)*s_vec(1)-c_bliss)^(-gamma);
+        
     MPCC_backcons;
     [cF(s_bl_index)]=min(cF(s_bl_index),c_bl(s_bl_index)); % include borrowing constraint limit
     [cB(s_bl_index)]=min(cB(s_bl_index),c_bl(s_bl_index)); % include borrowing constraint limit    
@@ -34,7 +34,7 @@ while cond>tol % value function iteration
     c0 = r_vec.*s_vec/p + y2; 
     c0(s_bl_index)      = r_vec(s_bl_index).*s_vec(s_bl_index)/p + y1;
     [c0(s_bl_index)]=min(c0(s_bl_index),c_bl(s_bl_index)); % include borrowing constraint limit
-    dv0 = c0.^(-gamma);
+    dv0 = (c0-c_bliss).^(-gamma);
 
     H0  = URF(c0);
 

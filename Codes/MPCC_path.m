@@ -1,12 +1,12 @@
 %% MPCC_path
 % Update Income path
-cond=2*tol;
-Y_ss=steady.Y_ss;
-y1_out = paths.mu_w_t(1,:)+steady.RT_ss;
-y2_out = paths.mu_w_t(2,:)+steady.RT_ss;
-y_out=[y1_out; y2_out];
+cond   = 2*tol*10;
+Y_ss   = steady.Y_ss;
+y1_out = paths.mu_w_t(1,:)+RT_t;
+y2_out = paths.mu_w_t(2,:)+RT_t;
+y_out  = [y1_out; y2_out];
 
-while cond>tol
+while cond>tol*10
     % Update Income
     y=y_out;    
     
@@ -38,13 +38,13 @@ while cond>tol
         % Derivative and Policy Rule
         % Finite difference approximation
         dvF(1:end-1) = (V(2:end) - V(1:end-1))./(s_vec(2:end) - s_vec(1:end-1)); % Forward
-        dvF(N)       = (y2 + r_vec(end)*s_vec(end))^(-gamma);
+        dvF(N)       = (y2 + r_vec(end)*s_vec(end))^(-gamma)+c_bliss;
         dvB(2:end)   = (V(2:end) - V(1:end-1))./(s_vec(2:end) - s_vec(1:end-1)); % Forward
-        dvB(1)       = (y1 + r_vec(1)*s_vec(1))^(-gamma);
+        dvB(1)       = 1e-5^(-gamma);%(y1 + r_vec(1)*s_vec(1)-c_bliss)^(-gamma);
 
         MPCC_backcons;
-        [cF(1:ss)]=min(cF(1:ss),c_bl(1:ss)); % include borrowing constraint limit
-        [cB(1:ss)]=min(cB(1:ss),c_bl(1:ss)); % include borrowing constraint limit    
+        cF(1:ss)=min(cF(1:ss),c_bl(1:ss)); % include borrowing constraint limit
+        cB(1:ss)=min(cB(1:ss),c_bl(1:ss)); % include borrowing constraint limit    
         cF(cF<0)   = 0; cB(cB<0)   = 0;
 
         % Update Drifts and Volatilities  
@@ -58,19 +58,19 @@ while cond>tol
         muB(1:ss) = r_vec(1:ss).*s_vec(1:ss) + (y1 - cB(1:ss))*p ;                                                             
         HcB       = URF(cB) + dvB.*muB;      % backward Hamiltonian
 
-        c0 = r_vec.*s_vec/p + y2; 
-        c0(1:ss)      = r_vec(1:ss).*s_vec(1:ss)/p + y1;
-    %     [c0(1:ss)]=min(c0(1:ss),c_bl(1:ss)); % include borrowing constraint limit
-        dv0 = c0.^(-gamma);    
-        H0  = URF(c0);
+        c0        = r_vec.*s_vec/p + y2; 
+        c0(1:ss)  = r_vec(1:ss).*s_vec(1:ss)/p + y1;
+        c0(1:ss)  = min(c0(1:ss),c_bl(1:ss)); % include borrowing constraint limit
+        dv0       = (c0-c_bliss).^(-gamma);    
+        H0        = URF(c0);
 
 
         % Handling with non-convexities
         Ineither = (1-(muF>0)) .* (1-(muB<0));
         Iunique  = (muB<0).*(1-(muF>0)) + (1-(muB<0)).*(muF>0);
         Iboth    = (muB<=0).*(muF>=0);
-        Ib       = Iunique.*(muB<0) + Iboth.*(HcB>HcF);
-        If       = Iunique.*(muF>0) + Iboth.*(HcF>=HcB);
+        Ib       = Iunique.*(muB<0) + Iboth.*(real(HcB)>real(HcF));
+        If       = Iunique.*(muF>0) + Iboth.*(real(HcF)>=real(HcB));
         I0       = Ineither;   
 
         Ib(N) = 1; If(N) = 0; I0(N) = 0;   
@@ -156,7 +156,7 @@ while cond>tol
     Z_M = zeros(1,T);
 
     % Market clearing along path
-    for tt = 1:T,
+    for tt = 1:T
             w1   = paths.mu_w_t(1,tt); 
             w2   = paths.mu_w_t(2,tt); 
             % Total Endowment people receive, given policy, from distribution
@@ -202,11 +202,19 @@ while cond>tol
             G_t(tt)=0; % Government Expenditures
 
             % Excess Savings Supply
-            Z_Y(tt) = (Y_t(tt)-C_t(tt)-G_t(tt))./Y_t(tt);  
+            Z_Y(tt) = (Y_t(tt)-C_t(tt)-G_t(tt))./Y_t(tt);                      
     end
+    
     % Update income paths
-    y1_out=paths.mu_w_t(1,:)+RT_t(1:T);
-    y2_out=paths.mu_w_t(2,:)+RT_t(1:T);
+    if any(strcmp(mpregime,{'FP' 'RP'}))
+        y1_out=paths.mu_w_t(1,:)+RT_t;
+        y2_out=paths.mu_w_t(2,:)+RT_t;
+    elseif strcmp(mpregime,{'BP'})
+        FT_t=rsp_t.*B_t;
+        y1_out=paths.mu_w_t(1,:)+RT_t+FT_t;
+        y2_out=paths.mu_w_t(2,:)+RT_t+FT_t;
+    end
+    
     y_out=[y1_out; y2_out];
 
     % Find the optimality condition

@@ -9,6 +9,7 @@ while cond>tol
     y1=y1_out;
     y2=y2_out;
     y =[y1; y2];
+    c_bl = [y1 + r_vec(1)*s_vec(1);y1*ones(N-1,1)];  
     
     MPCC_solve_cons_steady;
 
@@ -41,9 +42,10 @@ while cond>tol
     
     % Update income process
     if strcmp(mpregime,'BP');
-        RT_ss=rs*(Ef_ss*D_ss)            ;
-        y1_out=w1 + RT_ss;
-        y2_out=w2 + RT_ss;
+        RT_ss=rs*(Ef_ss*D_ss);
+        FT_ss=rsp_ss*B_ss;
+        y1_out=w1 + RT_ss + FT_ss;
+        y2_out=w2 + RT_ss + FT_ss;
         y_out=[y1_out; y2_out];
         cond=max(abs(y-y_out)./y);
     elseif strcmp(mpregime,'RP');
@@ -53,7 +55,7 @@ while cond>tol
         y_out=[y1_out; y2_out];
         cond=max(abs(y-y_out)./y);
     elseif strcmp(mpregime,'FP');
-        RT_ss=0                                     ;
+        RT_ss=0 ;
         y1_out=w1 + RT_ss ;
         y2_out=w2 + RT_ss  ;
         y_out=[y1_out; y2_out];
@@ -67,6 +69,6 @@ end
 Z_Y_ss=(Y_ss-C_ss)/Y_ss;
 if strcmp(mpregime,'FP');
     Z_S_ss=(B_ss-D_ss)/D_ss; % pin down value
-elseif strcmp(mpregime,'RP');
+elseif any(strcmp(mpregime,{'RP' 'BP'}));
     Z_S_ss=((1+Ef_ss)*D_ss-B_ss)/D_ss; % Market clearing condition        
 end

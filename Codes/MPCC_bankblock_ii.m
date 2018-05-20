@@ -27,12 +27,13 @@ ibar_z =@(pol_d) pol_d*(1-(1-exp(-(eta)*barlam))/(1-exp(-barlam)));
 
 % definitions at unit limit
 chi_p_o=@(pol_d) pol_d*(1-eta)*(1-exp(-barlam));
-chi_m_o=@(pol_d) pol_d*(1-eta*(1-exp(-barlam)));  
+chi_m_o=@(pol_d) pol_d*(1-eta*(1-exp(-barlam)));
 ibar_o =@(pol_d) pol_d*(1-eta)                 ;
 
 % Definition of Rates
 bal_p=@(mu) mu-varrho+(1-varrho)*omega;
 bal_m=@(mu) mu-varrho-(1-varrho)*omega;
+
 % At interior solutions
 r_b_mu=@(r_m,mu,chip,chim) r_m+1/2*(chim.*((bal_p(mu)<0)+(bal_m(mu)<0))...
     +chip.*((bal_p(mu)>0)+(bal_m(mu)>0))); 

@@ -1,18 +1,19 @@
 %% Moll's algorithm
 % 
 cond =2*tol_dyn;
-r_t = rs_t_o';
+r_t = rs_t_o;
 iter=0;
 dZ_S = nan(T,1);
-
+% xi   = 1e-5;
 D = [];
 r = [];
 Z = [];
 % flagx10 =0;
+
 while cond>tol_dyn
     [~,Z_S,D_t] = eqpath(r_t);
 
-    r_t        = r_t - xi'.*Z_S';  
+    r_t        = r_t - xi.*Z_S;  
 
     
     if iter<200

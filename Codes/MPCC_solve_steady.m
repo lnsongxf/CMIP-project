@@ -1,4 +1,4 @@
-function [res]=MPCC_solve_steady_FP(rs,inputs,paths)
+function [res]=MPCC_solve_steady(rs,inputs)
 % Variables defined as global come in
 MPCC_globals;
 
