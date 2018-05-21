@@ -7,7 +7,7 @@
 % Main block happens here
 clear all; 
 close all;
-nameplot = 'bp_zlb';
+nameplot = 'bp_zlb1';
 
 addpath(genpath([cd '\Codes']));
 % Graphs
@@ -49,7 +49,7 @@ plotit    =0; %
 breakit   =0; % 
 printit   =1; % set to 1, if you want to save figures.
 plotib    =0; % Interbank market plots
-flag_compute = 0;
+flag_compute = 1;
 
 %% [I] Code Parameters and shocks parameters
 % Convergence Criterion

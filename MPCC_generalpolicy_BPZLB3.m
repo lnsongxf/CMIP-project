@@ -24,7 +24,7 @@ otitle       = @(x) title(x, 'Fontname', 'Times', 'FontWeight', 'normal', 'Fonts
 %% Definition of Global Variables
 MPCC_globals; % Define list of globals
 
-flag_unant =0;  % [1] Unanticipated shock
+flag_unant =1;  % [1] Unanticipated shock
 cc         =1;  %figure counter
 solveit    =1;  % solveit:
                 % [0] uses bisection algorithm to find interest rate
