@@ -1,14 +1,14 @@
 %% Computing Inflation and Monetary Policy Variables
 
 % Interbank Market block 
-varrho  = 0.5 ; % Reserve Requirement
-barlam  = 2.5 ; % Efficiency interbank market
-eta     = 0.5 ; % Bargaining
+varrho  = 0.478 ; % Reserve Requirement
+barlam  = 3.5  ; % Efficiency interbank market
+eta     = 0.5  ; % Bargaining
 omega   = 0.42 ; % Average size of shock - interbank
 
 % Steady State Targets:
 imonmu_ss = varrho;
-i_m_ss    = 0.00;
+% i_m_ss    = 0.02;
 isp_ss    = 0.06;   
 
 % For Plots
@@ -72,7 +72,6 @@ cc=cc+1;
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Constant Monetary Rate Rule
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 MB_ss1= mu_ss_target*D_ss    ;
 MB_t  = MB_ss1*ones(T,1); %*cumprod(ones(T,1)-0.01)       ;  % constant along transition
 ND_t  = D_t                      ;
@@ -129,8 +128,8 @@ cc=cc+1;
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Inflation Target Rule
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-psipi=0.0125;
-psiyi=0.4;
+psipi = 1.5;
+psiyi = 0.5;
 
 % Construc auxiliaries
 index_rd=(r_b_vec>min(r_b_vec))& (r_b_vec<max(r_b_vec));
@@ -147,10 +146,10 @@ dP_t  = inf_target*ones(T,1)     ;
 id_t  = i_target*ones(T,1)       ;
 
 for tt=1:T-1
-    dP_t(tt)=id_t(tt)-rs_t(tt)                  ;
-    P_t(tt+1)=P_t(tt)*(1+dP_t(tt)*dt)             ;
+    dP_t(tt+1)= max(1/(1-psipi)*(i_target-psipi*inf_target+psiyi*(Y_t(tt+1)-Y_ss)/Y_ss-rs_t(tt+1)),-rs_t(tt+1)); %id_t(tt)-rs_t(tt)                  ;
+    P_t(tt+1) = P_t(tt)*(1+dP_t(tt+1)*dt)         ;
     ND_t(tt+1)=D_t(tt+1)*P_t(tt+1)                ;
-    id_t(tt+1)=max(0,i_target+psipi*(dP_t(tt)-inf_target)+psiyi*(Y_t(tt)-Y_ss)/Y_ss);    % Zero lower bound
+    id_t(tt+1)=max(0,rs_t(tt+1)+dP_t(tt+1));    % Zero lower bound
     mu_t(tt+1)=interp1(r_d_aux,mu_aux,id_t(tt+1),'pchip');
 end
 index_1=(2:T+1);

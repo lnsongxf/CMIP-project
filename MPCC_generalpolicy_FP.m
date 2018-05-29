@@ -49,7 +49,7 @@ plotit    =0; %
 breakit   =0; % 
 printit   =1; % set to 1, if you want to save figures.
 plotib    =0; % Interbank market plots
-flag_compute = 0;
+flag_compute =0;
 
 %% [I] Code Parameters and shocks parameters
 % Convergence Criterion
@@ -107,18 +107,19 @@ color2_shock=[0.6 0.2 0.2];
 %% [III] Model Parameter Definitions
 
 % Model Parameters - Preferences and Technology
-gamma = 3     ; % agent's risk aversion
-rho   = 0.04  ; % agent's individual discount rates 
+gamma = 3     ; %3  agent's risk aversion
+rho   = 0.05  ; %4  agent's individual discount rates 
 w1    = 50    ; % mean return - low intensity technology
 w2    = 100   ; % mean return - high intensity technology
 s1    = 0     ; % volatility - low intensity technology
 s2    = 100   ; % volatility - high intensity technology
+eta_l = 1;
 
 % Initial Guess for interest rate rate
 rs_o   = 0.01 ;
 
 % Borrowing Limit - nominal
-s_bar  = -10*w2        ;  % debt limit 
+s_bar  = -10*w2       ;  % 10 debt limit 
 s_bl   = s_bar        ;  % index where 
 
 % Vectorizations
@@ -134,8 +135,8 @@ delta_ef    =     0 ; % adjustment of FED policy
 delta_trans =     0 ; % speed of transfer adjustment
 
 % Interbank Market block 
-varrho  = 0.5 ; % Reserve Requirement
-barlam  = 2.5 ; % Efficiency interbank market
+varrho  = 0.478 ; % Reserve Requirement
+barlam  = 3.5 ; % Efficiency interbank market
 eta     = 0.5 ; % Bargaining
 omega   = 0.42 ; % Average size of shock - interbank
 

@@ -1,7 +1,8 @@
 % There is no so much difference yet.
-
-y1_out = w1;
-y2_out = w2;
+upsilon = 0.04                         ; 
+y_guess = w2+upsilon*(w1-w2)           ;
+y1_out  = w1*eta_l + y_guess*(1-eta_l) ;
+y2_out  = w2*eta_l + y_guess*(1-eta_l) ;
 cond = 2*tol;
 
 while cond>tol
@@ -44,20 +45,20 @@ while cond>tol
     if strcmp(mpregime,'BP');
         RT_ss=rs*(Ef_ss*D_ss);
         FT_ss=rsp_ss*B_ss;
-        y1_out=w1 + RT_ss + FT_ss;
-        y2_out=w2 + RT_ss + FT_ss;
+        y1_out=w1*eta_l + Y_ss*(1-eta_l) + RT_ss + FT_ss;
+        y2_out=w2*eta_l + Y_ss*(1-eta_l) + RT_ss + FT_ss;
         y_out=[y1_out; y2_out];
         cond=max(abs(y-y_out)./y);
     elseif strcmp(mpregime,'RP');
         RT_ss=D_ss*(Ef_ss)*rs;
-        y1_out=w1+RT_ss;
-        y2_out=w2+RT_ss;
+        y1_out=w1*eta_l + Y_ss*(1-eta_l)+RT_ss;
+        y2_out=w2*eta_l + Y_ss*(1-eta_l)+RT_ss;
         y_out=[y1_out; y2_out];
         cond=max(abs(y-y_out)./y);
     elseif strcmp(mpregime,'FP');
         RT_ss=0 ;
-        y1_out=w1 + RT_ss ;
-        y2_out=w2 + RT_ss  ;
+        y1_out=w1*eta_l + Y_ss*(1-eta_l) + RT_ss ;
+        y2_out=w2*eta_l + Y_ss*(1-eta_l) + RT_ss  ;
         y_out=[y1_out; y2_out];
         cond=max(abs(y-y_out)./y);
     end    

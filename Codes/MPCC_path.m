@@ -2,8 +2,8 @@
 % Update Income path
 cond   = 2*tol*10;
 Y_ss   = steady.Y_ss;
-y1_out = paths.mu_w_t(1,:)+RT_t;
-y2_out = paths.mu_w_t(2,:)+RT_t;
+y1_out = paths.mu_w_t(1,:)*eta_l+Y_ss*(1-eta_l)+RT_t;
+y2_out = paths.mu_w_t(2,:)*eta_l+Y_ss*(1-eta_l)+RT_t;
 y_out  = [y1_out; y2_out];
 
 while cond>tol*10
@@ -207,12 +207,12 @@ while cond>tol*10
     
     % Update income paths
     if any(strcmp(mpregime,{'FP' 'RP'}))
-        y1_out=paths.mu_w_t(1,:)+RT_t;
-        y2_out=paths.mu_w_t(2,:)+RT_t;
+        y1_out=paths.mu_w_t(1,:)*eta_l + Y_t*(1-eta_l)+RT_t;
+        y2_out=paths.mu_w_t(2,:)*eta_l + Y_ss*(1-eta_l)+RT_t;
     elseif strcmp(mpregime,{'BP'})
         FT_t=rsp_t.*B_t;
-        y1_out=paths.mu_w_t(1,:)+RT_t+FT_t;
-        y2_out=paths.mu_w_t(2,:)+RT_t+FT_t;
+        y1_out=paths.mu_w_t(1,:)*eta_l + Y_t*(1-eta_l)+RT_t+FT_t;
+        y2_out=paths.mu_w_t(2,:)*eta_l + Y_t*(1-eta_l)+RT_t+FT_t;
     end
     
     y_out=[y1_out; y2_out];

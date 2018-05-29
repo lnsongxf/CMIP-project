@@ -4,7 +4,7 @@ inf_target = 0.00            ;   % Inflation Target
 i_target   = rs_ss+inf_target;   % Nominal Rate Target
  
 % Construct the index of admissible values
-index0 = zlb_index(1);
+% index0 = zlb_index(1);
 
 r_m_aux = i_m_ss;
 MPCC_bankblock_ii;
@@ -83,7 +83,7 @@ line([T_pre T_pre],[yout(1) yout(2)],'Color','k','LineWidth',1,'LineStyle','-');
 line([T_post-1 T_post-1],[yout(1) yout(2)],'Color','k','LineWidth',1,'LineStyle','-');
 h=patch([T_pre T_post-1 T_post-1 T_pre],[yout(1) yout(1) yout(2) yout(2)],[0.9 0.9 0.9]); alpha(h,0.2);
 label_x('time'); label_y('Price index'); %otitle('Price Index Path');
-formataxis(gca); axis tight; xlim([0 t_plotmax/2]);
+formataxis(gca); axis tight; xlim([0 t_plotmax]);
 if printit==1
     imprime(['fig' nameplot num2str(cc)]);
     imprpdf(['fig' nameplot num2str(cc)]);
@@ -100,7 +100,7 @@ h=patch([T_pre T_post-1 T_post-1 T_pre],[yout(1) yout(1) yout(2) yout(2)],[0.9 0
 % otitle('Cash Holdings');
 label_x('time');
 legend('Currency','Reserves'); formatlegend('Best');axis tight;
-formataxis(gca);  xlim([0 t_plotmax/2]);
+formataxis(gca);  xlim([0 t_plotmax]);
 if printit==1
     imprime(['fig' nameplot num2str(cc)]);
     imprpdf(['fig' nameplot num2str(cc)]);
@@ -120,7 +120,7 @@ h=patch([T_pre T_post-1 T_post-1 T_pre],[yout(1) yout(1) yout(2) yout(2)],[0.9 0
 % otitle('Fisher Equation Decomp.');
 legend('Inflation','Nominal Rate','Real Rate','Inflation Target'); axis tight;
 label_x('time'); label_y('$\%$');
-formataxis(gca); axis tight; xlim([0 t_plotmax/2]);
+formataxis(gca); axis tight; xlim([0 t_plotmax]);
 
 formatlegend('northeast');
 if printit==1
