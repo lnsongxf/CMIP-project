@@ -114,6 +114,7 @@ w1    = 50    ; % mean return - low intensity technology
 w2    = 100   ; % mean return - high intensity technology
 s1    = 0     ; % volatility - low intensity technology
 s2    = 100   ; % volatility - high intensity technology
+eta_l = 1;
 
 % Initial Guess for interest rate rate
 rs_o   = 0.01;
@@ -330,6 +331,25 @@ paths_list_tit={'r^o^r_t','r^d^w_t','\mu_2','\sigma_2','s^b^l_t','T_t'};
 
 %% [VIII] Run a code that reports the shocks
 MPPC_report_shocks;
+if isempty(zlb_index) 
+    index0 = numel(mu_vec);
+    Dr_zlb = r_b_vec(index0) - r_d_vec(index0) ;
+end
+
+if list(1) ==1
+    zlb_index  = index0*ones(1,T);
+    Dr_zlb  = Dr_zlb*ones(1,T);
+    for t=T_pre+1:T_post;
+        r_m_aux = rr_t(t);
+        MPCC_bankblock_ii;
+        MPCC_interbank_vecs;
+        index0 = find((r_d_vec<=0),1,'first');
+        if ~isempty(index0)
+            Dr_zlb(t) = r_b_vec(index0) - r_d_vec(index0);
+            zlb_index(t) = index0;
+        end
+    end   
+end
 
 %% [X] Solving Transition 
 % Guess for prices

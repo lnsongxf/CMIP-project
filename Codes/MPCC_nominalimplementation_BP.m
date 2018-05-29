@@ -4,7 +4,8 @@ inf_target = 0.00            ;   % Inflation Target
 i_target   = rs_ss+inf_target;   % Nominal Rate Target
  
 % Construct the index of admissible values
-% index0 = zlb_index(1);
+
+index0 = zlb_index(1);
 
 r_m_aux = i_m_ss;
 MPCC_bankblock_ii;
