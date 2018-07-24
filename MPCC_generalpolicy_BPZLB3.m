@@ -49,7 +49,7 @@ plotit    =0; %
 breakit   =0; % 
 printit   =1; % set to 1, if you want to save figures.
 plotib    =0; % Interbank market plots
-flag_compute = 1;
+flag_compute = 0;
 
 %% [I] Code Parameters and shocks parameters
 % Convergence Criterion
@@ -60,7 +60,7 @@ cond    = 2*tol;
 options = optimset('TolFun',1e-8,'Display','iter'); % At Optimization
 
 % Approximate Amount of grid points
-N     = 300;            % Number of Gridpoints in Real Wealth Space
+N     = 800;            % Number of Gridpoints in Real Wealth Space
 
 % Time Parameters
 T     = 100      ;  % Time Horizon
@@ -70,10 +70,10 @@ Delta = 10       ;  % Delta for solving Bellman equation at the stationary equil
 % Periods for Transition
 if flag_unant
     T_pre=1;
-    T_post=11;
+    T_post=16;
 else
     T_pre = 15       ; % Time Lapse prior to transition
-    T_post= 25       ; % Time Lapse after transition
+    T_post= 30       ; % Time Lapse after transition
 end
 
 % State-Space Grid
@@ -87,10 +87,13 @@ dt_f   = dt/Titer; % A step size for the KFE
 % Shocks
 shock_mu    = 1.0                            ;
 shock_sigma = 1.0                            ;
-rr_shock    = [0 0 0 0 -2 -3 -3 -4 -4 -4]  ;
-rsp_shock  = 1;
-shock_s_bl = 1;
-shock_T    = 0                              ;  
+for ii=1:T_post-T_pre
+    rr_shock(ii) = 0.75-4*(1-0.9^(ii));
+end
+
+rsp_shock   = 1                              ;
+shock_s_bl  = 1                              ;
+shock_T     = 0                              ;  
 
 % Clearing Condition
 clearcond='S'; % Y for goods market and S for asset market
@@ -108,7 +111,7 @@ color2_shock=[0.6 0.2 0.2];
 %% [III] Model Parameter Definitions
 
 % Model Parameters - Preferences and Technology
-gamma = 1     ; % agent's risk aversion
+gamma = 0.8     ; % agent's risk aversion
 rho   = 0.03 ; % agent's individual discount rates 
 w1    = 50    ; % mean return - low intensity technology
 w2    = 100   ; % mean return - high intensity technology
@@ -138,7 +141,7 @@ delta_trans =     0.9  ; % speed of transfer adjustment
 varrho  = 0.7 ; % Reserve Requirement
 barlam  = 1.5 ; % Efficiency interbank market
 eta     = 0.5 ; % Bargaining
-omega   = 0.3 ; % Average size of shock - interbank
+omega   = 0.2 ; % Average size of shock - interbank
 
 % Steady State Targets:
 imonmu_ss = varrho;
@@ -330,12 +333,16 @@ paths_list_tit={'r^o^r_t','r^d^w_t','\mu_2','\sigma_2','s^b^l_t','T_t'};
 
 %% [VIII] Run a code that reports the shocks
 MPPC_report_shocks;
+
 if isempty(zlb_index) 
     index0 = numel(mu_vec);
     Dr_zlb = r_b_vec(index0) - r_d_vec(index0) ;
+else
+    index0 = zlb_index(1);
+    Dr_zlb = r_b_vec(index0) - r_d_vec(index0) ;
 end
 
-if list(1) ==1
+if list(1) == 1
     zlb_index  = index0*ones(1,T);
     Dr_zlb  = Dr_zlb*ones(1,T);
     for t=T_pre+1:T_post;
@@ -650,6 +657,7 @@ if printit==1
     imprpdf(['fig' nameplot num2str(cc)]);
 end    
 cc=cc+1;
+delete([path_g '/*.eps']);
 return
 %% Diagnostics
 % Plotting Residual Functions - Internal Use

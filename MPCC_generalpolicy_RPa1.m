@@ -60,7 +60,7 @@ cond    = 2*tol;
 options = optimset('TolFun',1e-8,'Display','iter'); % At Optimization
 
 % Approximate Amount of grid points
-N     = 300;            % Number of Gridpoints in Real Wealth Space
+N     = 800;            % Number of Gridpoints in Real Wealth Space
 
 % Time Parameters
 T     = 100      ;  % Time Horizon
@@ -87,9 +87,9 @@ dt_f   = dt/Titer; % A step size for the KFE
 % Shocks
 shock_mu   = 1.0                            ;
 shock_sigma= 1.0                            ;
-rsp_shock  = 1;
-shock_s_bl = 1;
-shock_T    = -4                             ;  
+rsp_shock  = 1                              ;
+shock_s_bl = 1                              ;
+shock_T    = -5                             ;  
 
 % Clearing Condition
 clearcond='S'; % Y for goods market and S for asset market
@@ -97,7 +97,7 @@ clearcond='S'; % Y for goods market and S for asset market
 %% [II] Plot Preferences
 % Plot Properties
 s_plotmax=round(N/4);
-t_plotmax= 80;
+t_plotmax= 75;
 
 % Steady State - Shock Colors
 color1_ss   =[0.2 0.2 0.6];
@@ -113,6 +113,7 @@ w1    = 50    ; % mean return - low intensity technology
 w2    = 100   ; % mean return - high intensity technology
 s1    = 0     ; % volatility - low intensity technology
 s2    = 150   ; % volatility - high intensity technology
+eta_l = 1     ; % Demand Externality     
 
 % Initial Guess for interest rate rate
 rs_o   = 0.01;
@@ -629,6 +630,7 @@ if printit==1
     imprpdf(['fig' nameplot num2str(cc)]);
 end    
 cc=cc+1;
+delete([path_g '/*.eps']);
 return
 %% Diagnostics
 % Plotting Residual Functions - Internal Use

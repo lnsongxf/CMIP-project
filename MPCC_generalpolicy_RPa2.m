@@ -44,11 +44,11 @@ mpregime='RP' ;
 % -------------------------------------------------------------------------               
                 
 %% Running Preferences
-plotiter  =0; % set to 1, if want to see algorithm converge
-plotit    =0; % 
-breakit   =0; % 
-printit   =1; % set to 1, if you want to save figures.
-plotib    =0; % Interbank market plots
+plotiter     = 0; % set to 1, if want to see algorithm converge
+plotit       = 0; % 
+breakit      = 0; % 
+printit      = 1; % set to 1, if you want to save figures.
+plotib       = 0; % Interbank market plots
 flag_compute = 0;
 
 %% [I] Code Parameters and shocks parameters
@@ -60,7 +60,7 @@ cond    = 2*tol;
 options = optimset('TolFun',1e-8,'Display','iter'); % At Optimization
 
 % Approximate Amount of grid points
-N     = 300;            % Number of Gridpoints in Real Wealth Space
+N     = 800;            % Number of Gridpoints in Real Wealth Space
 
 % Time Parameters
 T     = 100      ;  % Time Horizon
@@ -87,9 +87,9 @@ dt_f   = dt/Titer; % A step size for the KFE
 % Shocks
 shock_mu   = 1.0                            ;
 shock_sigma= 1.0                            ;
-rsp_shock  = 1;
-shock_s_bl = 1;
-shock_T    = -4                             ;  
+rsp_shock  = 1                              ;
+shock_s_bl = 1                              ;
+shock_T    = -5                             ;  
 
 % Clearing Condition
 clearcond='S'; % Y for goods market and S for asset market
@@ -629,6 +629,7 @@ if printit==1
     imprpdf(['fig' nameplot num2str(cc)]);
 end    
 cc=cc+1;
+delete([path_g '/*.eps']);
 return
 %% Diagnostics
 % Plotting Residual Functions - Internal Use

@@ -33,7 +33,7 @@ solveit    =1;  % solveit:
                 
 
 %% [V] Policy and Assumed Prices
-mpregime='BP' ;
+mpregime = 'BP' ;
 
 % set to:
 % -------------------------------------------------------------------------
@@ -44,11 +44,11 @@ mpregime='BP' ;
 % -------------------------------------------------------------------------               
                 
 %% Running Preferences
-plotiter  =0; % set to 1, if want to see algorithm converge
-plotit    =0; % 
-breakit   =0; % 
-printit   =1; % set to 1, if you want to save figures.
-plotib    =0; % Interbank market plots
+plotiter     = 0; % set to 1, if want to see algorithm converge
+plotit       = 0; % 
+breakit      = 0; % 
+printit      = 1; % set to 1, if you want to save figures.
+plotib       = 0; % Interbank market plots
 flag_compute = 1;
 
 %% [I] Code Parameters and shocks parameters
@@ -60,7 +60,7 @@ cond    = 2*tol;
 options = optimset('TolFun',1e-8,'Display','iter'); % At Optimization
 
 % Approximate Amount of grid points
-N     = 300;            % Number of Gridpoints in Real Wealth Space
+N     = 800;            % Number of Gridpoints in Real Wealth Space
 
 % Time Parameters
 T     = 100      ;  % Time Horizon
@@ -70,10 +70,10 @@ Delta = 10       ;  % Delta for solving Bellman equation at the stationary equil
 % Periods for Transition
 if flag_unant
     T_pre=1;
-    T_post=11;
+    T_post=16;
 else
     T_pre = 15       ; % Time Lapse prior to transition
-    T_post= 25       ; % Time Lapse after transition
+    T_post= 30       ; % Time Lapse after transition
 end
 
 % State-Space Grid
@@ -87,9 +87,10 @@ dt_f   = dt/Titer; % A step size for the KFE
 % Shocks
 shock_mu   = 1.0                            ;
 shock_sigma= 1.0                            ;
-rsp_shock  = [0.9 0.85 0.75 0.6 0.5 ...
-              0.4 0.4 0.4 0.4 0.4];
-shock_s_bl = 0.7;
+for ii=1:T_post-T_pre
+    rsp_shock(ii)  = 0.8^(ii);
+end
+shock_s_bl = 0.7                            ;
 shock_T    = 0                              ;  
 
 % Clearing Condition
@@ -99,6 +100,7 @@ clearcond='S'; % Y for goods market and S for asset market
 % Plot Properties
 s_plotmax=round(N/5);
 t_plotmax= 50;
+s_plotheight = 2.5;         % it controls the height of distribution
 
 % Steady State - Shock Colors
 color1_ss   =[0.2 0.2 0.6];
@@ -108,12 +110,13 @@ color2_shock=[0.6 0.2 0.2];
 %% [III] Model Parameter Definitions
 
 % Model Parameters - Preferences and Technology
-gamma = 1     ; % agent's risk aversion
+gamma = 0.8   ; % agent's risk aversion
 rho   = 0.045 ; % agent's individual discount rates 
 w1    = 50    ; % mean return - low intensity technology
 w2    = 100   ; % mean return - high intensity technology
 s1    = 0     ; % volatility - low intensity technology
 s2    = 100   ; % volatility - high intensity technology
+eta_l = 1     ; % Demand Externality     
 
 % Initial Guess for interest rate rate
 rs_o   = 0.01;
@@ -330,6 +333,28 @@ paths_list_tit={'r^o^r_t','r^d^w_t','\mu_2','\sigma_2','s^b^l_t','T_t'};
 
 %% [VIII] Run a code that reports the shocks
 MPPC_report_shocks;
+if isempty(zlb_index) 
+    index0 = numel(mu_vec);
+    Dr_zlb = r_b_vec(index0) - r_d_vec(index0) ;
+else
+    index0 = zlb_index(1);
+    Dr_zlb = r_b_vec(index0) - r_d_vec(index0) ;
+end
+
+if list(1) == 1
+    zlb_index  = index0*ones(1,T);
+    Dr_zlb  = Dr_zlb*ones(1,T);
+    for t=T_pre+1:T_post;
+        r_m_aux = rr_t(t);
+        MPCC_bankblock_ii;
+        MPCC_interbank_vecs;
+        index0 = find((r_d_vec<=0),1,'first');
+        if ~isempty(index0)
+            Dr_zlb(t) = r_b_vec(index0) - r_d_vec(index0);
+            zlb_index(t) = index0;
+        end
+    end   
+end
 
 %% [X] Solving Transition 
 % Guess for prices
@@ -427,10 +452,12 @@ endopath.Y_t=Y_t;
 endopath.B_t=B_t;
 endopath.D_t=D_t;
 endopath.f_t=f_t;
+endopath.C_t=C_t;
 
 eval(['save DD' nameplot ' c_t V_t f_t D_t B_t s_vec rs rs_t rs_ss f_ss steady paths endopath']);
 rs_t(1) = rs_ss;
 rb_t(1) = rs_ss+rsp_ss;
+
 MPCC_nominalimplementation_BP;
 
 %% [XI] Welfare Calculations
@@ -591,7 +618,7 @@ end
 cc=cc+1;
 
 figure(cc)
-surf(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),f_t(2:s_plotmax,1:t_plotmax),'edgealpha',.1);
+surf(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),min(f_t(2:s_plotmax,1:t_plotmax),s_plotheight*1e-3),'edgealpha',.1);
 hold on;
 scatter3(Periods(1:t_plotmax)-1,s_vec(1)*ones(1,t_plotmax),f_t(1,1:t_plotmax)); 
 axis tight;
@@ -606,7 +633,7 @@ cc=cc+1;
 
 % Tests
 figure(cc)
-h=surface(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),f_t(2:s_plotmax,1:t_plotmax),'edgealpha',.01);
+h=surface(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),min(f_t(2:s_plotmax,1:t_plotmax),s_plotheight*1e-3),'edgealpha',.01);
 alpha(h,0.7);
 % otitle('Distribution of Wealth'); 
 label_x('time'); label_y('real wealth');
@@ -620,7 +647,7 @@ cc=cc+1;
 
 % Tests
 figure(cc)
-h=mesh(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),f_t(2:s_plotmax,1:t_plotmax));
+h=mesh(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),min(f_t(2:s_plotmax,1:t_plotmax),s_plotheight*1e-3));
 alpha(h,0.5); 
 axis tight; grid on;
 % otitle('Distribution of Wealth'); 
@@ -631,6 +658,7 @@ if printit==1
     imprpdf(['fig' nameplot num2str(cc)]);
 end    
 cc=cc+1;
+delete([path_g '/*.eps']);
 return
 %% Diagnostics
 % Plotting Residual Functions - Internal Use

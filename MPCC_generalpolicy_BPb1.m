@@ -60,7 +60,7 @@ cond    = 2*tol;
 options = optimset('TolFun',1e-8,'Display','iter'); % At Optimization
 
 % Approximate Amount of grid points
-N     = 300;            % Number of Gridpoints in Real Wealth Space
+N     = 800;            % Number of Gridpoints in Real Wealth Space
 
 % Time Parameters
 T     = 100      ;  % Time Horizon
@@ -330,6 +330,13 @@ paths_list_tit={'r^o^r_t','r^d^w_t','\mu_2','\sigma_2','s^b^l_t','T_t'};
 
 %% [VIII] Run a code that reports the shocks
 MPPC_report_shocks;
+if isempty(zlb_index) 
+    index0 = numel(mu_vec);
+    Dr_zlb = r_b_vec(index0) - r_d_vec(index0) ;
+else
+    index0 = zlb_index(1);
+    Dr_zlb = r_b_vec(index0) - r_d_vec(index0) ;
+end
 
 %% [X] Solving Transition 
 % Guess for prices
@@ -629,7 +636,7 @@ if printit==1
     imprpdf(['fig' nameplot num2str(cc)]);
 end    
 cc=cc+1;
-
+delete([path_g '/*.eps']);
 return
 %% Diagnostics
 % Plotting Residual Functions - Internal Use

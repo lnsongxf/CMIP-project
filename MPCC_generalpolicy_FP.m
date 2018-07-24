@@ -24,12 +24,12 @@ otitle       = @(x) title(x, 'Fontname', 'Times', 'FontWeight', 'normal', 'Fonts
 %% Definition of Global Variables
 MPCC_globals; % Define list of globals
 
-flag_unant =0;  % [1] Unanticipated shock
-cc         =1;  %figure counter
-solveit    =1;  % solveit:
-                % [0] uses bisection algorithm to find interest rate
-                %     path.
-                % [1] uses LM algorithm and solver function
+flag_unant = 0;  % [1] Unanticipated shock
+cc         = 1;  % figure counter
+solveit    = 1;  % solveit:
+                 % [0] uses bisection algorithm to find interest rate
+                 %     path.
+                 % [1] uses LM algorithm and solver function
                 
 
 %% [V] Policy and Assumed Prices
@@ -44,12 +44,12 @@ mpregime='FP' ;
 % -------------------------------------------------------------------------               
                 
 %% Running Preferences
-plotiter  =0; % set to 1, if want to see algorithm converge
-plotit    =0; % 
-breakit   =0; % 
-printit   =1; % set to 1, if you want to save figures.
-plotib    =0; % Interbank market plots
-flag_compute =0;
+plotiter     = 0; % set to 1, if want to see algorithm converge
+plotit       = 0; % 
+breakit      = 0; % 
+printit      = 1; % set to 1, if you want to save figures.
+plotib       = 0; % Interbank market plots
+flag_compute = 0;
 
 %% [I] Code Parameters and shocks parameters
 % Convergence Criterion
@@ -58,9 +58,10 @@ xi      = 1e-5;
 tol     = 1e-6;
 cond    = 2*tol;
 options = optimset('TolFun',1e-8,'Display','iter'); % At Optimization
+options_dyn=optimset('Algorithm',{'levenberg-marquardt',0.01},'MaxFunEvals',12000,'MaxIter',400,'TolFun',1e-6,'Display','iter');
 
 % Approximate Amount of grid points
-N     = 300;            % Number of Gridpoints in Real Wealth Space
+N     = 800      ;  % Number of Gridpoints in Real Wealth Space
 
 % Time Parameters
 T     = 100      ;  % Time Horizon
@@ -69,8 +70,8 @@ Delta = 10       ;  % Delta for solving Bellman equation at the stationary equil
 
 % Periods for Transition
 if flag_unant
-    T_pre=1;
-    T_post=11;
+    T_pre  = 1;
+    T_post = 11;
 else
     T_pre = 15       ; % Time Lapse prior to transition
     T_post= 25       ; % Time Lapse after transition
@@ -85,19 +86,20 @@ T_post = T_post/dt;
 dt_f   = dt/Titer; % A step size for the KFE
 
 % Shocks
-shock_mu   = 1.0                            ;
-shock_sigma= 1.0                            ;
-rsp_shock  = 1;
-shock_s_bl = 0.7  ; 
-shock_T    = 0                              ;  
+shock_mu   = 1.0   ;
+shock_sigma= 1.0   ;
+rsp_shock  = 1     ;
+shock_s_bl = 0.7   ; 
+shock_T    = 0     ;  
 
 % Clearing Condition
-clearcond='S'; % Y for goods market and S for asset market
+clearcond = 'S'; % Y for goods market and S for asset market
 
 %% [II] Plot Preferences
 % Plot Properties
-s_plotmax=round(N/4);
-t_plotmax= 80;
+s_plotheight = 1.1;         % it controls the height of distribution
+s_plotmax    = round(N/6);
+t_plotmax    = 75;
 
 % Steady State - Shock Colors
 color1_ss   =[0.2 0.2 0.6];
@@ -107,13 +109,13 @@ color2_shock=[0.6 0.2 0.2];
 %% [III] Model Parameter Definitions
 
 % Model Parameters - Preferences and Technology
-gamma = 3     ; %3  agent's risk aversion
-rho   = 0.05  ; %4  agent's individual discount rates 
+gamma = 0.9   ; %3  agent's risk aversion
+rho   = 0.02  ; %4  agent's individual discount rates 
 w1    = 50    ; % mean return - low intensity technology
 w2    = 100   ; % mean return - high intensity technology
 s1    = 0     ; % volatility - low intensity technology
-s2    = 100   ; % volatility - high intensity technology
-eta_l = 1;
+s2    = 125   ; % volatility - high intensity technology
+eta_l = 1     ; % Demand Externality            
 
 % Initial Guess for interest rate rate
 rs_o   = 0.01 ;
@@ -134,7 +136,7 @@ Ef_ss       =     0 ; % Governemnt's net worth/Deposits
 delta_ef    =     0 ; % adjustment of FED policy
 delta_trans =     0 ; % speed of transfer adjustment
 
-% Interbank Market block 
+% Interbank Market block (this block change in MPCC_nominalimplementation.m)
 varrho  = 0.478 ; % Reserve Requirement
 barlam  = 3.5 ; % Efficiency interbank market
 eta     = 0.5 ; % Bargaining
@@ -143,7 +145,7 @@ omega   = 0.42 ; % Average size of shock - interbank
 % Steady State Targets:
 imonmu_ss = varrho;
 i_m_ss    = 0.00;
-isp_ss    = 0.06;   
+isp_ss    = 0.08;   
 
 % Target for real spread
 rsp_ss     = 0.00;
@@ -356,7 +358,6 @@ end
 if flag_compute
     tic
     if solveit==1
-        options_dyn=optimset('Algorithm',{'levenberg-marquardt',0.01},'MaxFunEvals',12000,'MaxIter',400,'TolFun',1e-5,'Display','iter');
         rs_t=fsolve(eqpath,rs_t_o,options_dyn);
     else
         SOLVER_MA;
@@ -590,7 +591,7 @@ end
 cc=cc+1;
 
 figure(cc)
-surf(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),f_t(2:s_plotmax,1:t_plotmax),'edgealpha',.1);
+surf(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),min(f_t(2:s_plotmax,1:t_plotmax),s_plotheight*1e-3),'edgealpha',.1);
 hold on;
 scatter3(Periods(1:t_plotmax)-1,s_vec(1)*ones(1,t_plotmax),f_t(1,1:t_plotmax)); 
 axis tight;
@@ -605,7 +606,7 @@ cc=cc+1;
 
 % Tests
 figure(cc)
-h=surface(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),f_t(2:s_plotmax,1:t_plotmax),'edgealpha',.01);
+h=surface(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),min(f_t(2:s_plotmax,1:t_plotmax),s_plotheight*1e-3),'edgealpha',.01);
 alpha(h,0.7);
 % otitle('Distribution of Wealth'); 
 label_x('time'); label_y('real wealth');
@@ -619,7 +620,7 @@ cc=cc+1;
 
 % Tests
 figure(cc)
-h=mesh(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),f_t(2:s_plotmax,1:t_plotmax));
+h=mesh(Periods(1:t_plotmax)-1,s_vec(2:s_plotmax),min(f_t(2:s_plotmax,1:t_plotmax),s_plotheight*1e-3));
 alpha(h,0.5); 
 axis tight; grid on;
 % otitle('Distribution of Wealth'); 
@@ -630,6 +631,7 @@ if printit==1
     imprpdf(['fig' nameplot num2str(cc)]);
 end    
 cc=cc+1;
+delete([path_g '/*.eps']);
 return
 %% Diagnostics
 % Plotting Residual Functions - Internal Use

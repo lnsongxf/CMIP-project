@@ -12,10 +12,12 @@ function [result,msg] = eps2pdf(epsFile, orientation)
 % --------------------------------------------------------------------------------------------------
 
 rutaALEX = 'C:\Program Files\gs\gs9.23\bin\gswin64c.exe';        % Computadora (PUCRio) Alex Carrasco
+rutaALEX2= 'C:\Program Files (x86)\gs\gs9.15\bin\gswin32c.exe';        % Laptop Alex Carrasco
 
 check = true;
 
 if check && ~isempty(dir(rutaALEX)); ruta = rutaALEX; check = false; end
+if check && ~isempty(dir(rutaALEX2)); ruta = rutaALEX2; check = false; end
 
 if check    
     msg = 'No se encontró ruta de GhostScript';
