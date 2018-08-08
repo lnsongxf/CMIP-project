@@ -3,17 +3,17 @@ function [res,aux,D_t]=MPCC_path_solve_BP(rs_t,init_con,steady,paths)
 MPCC_globals;
 
 % initial condition for distribution 
-p_t=rs_t*0+1;
-f_0=init_con.f_0;
-rsp_t=paths.rsp_t;
+p_t   = rs_t*0+1;
+f_0   = init_con.f_0;
+rsp_t = paths.rsp_t;
 
 % Initial Value function
-V=steady.V_ss;
-f_ss=steady.f_ss; % Used only to draw a picture for the convergence
+V     = steady.V_ss;
+f_ss  = steady.f_ss; % Used only to draw a picture for the convergence
 D_ss  = steady.D_ss;
 rs_ss = steady.rs_ss;
 RT_ss = steady.RT_ss;
-TE_ss= steady.TE_ss;
+TE_ss = steady.TE_ss;
 
 if ~isempty(Dr_zlb)
     rsp_t=max(rsp_t,Dr_zlb);
@@ -23,13 +23,13 @@ end
 rb_t=rs_t+rsp_t;
 
 % Backout Transfer set
-T_t=paths.T_t                          ;
-index_T=(T_t~=0)                       ;
-index_T_T=find(index_T==1,1,'last')    ;
-RT_t=RT_ss*ones(1,T)                   ;
-RT_t_aux=RT_t                          ;
-TE_t=TE_ss*ones(1,T)                   ;
-TE_t_aux=TE_t                          ;
+T_t       = paths.T_t                     ;
+index_T   = (T_t~=0)                      ;
+index_T_T = find(index_T==1,1,'last')     ;
+RT_t      = RT_ss*ones(1,T)               ;
+RT_t_aux  = RT_t                          ;
+TE_t      = TE_ss*ones(1,T)               ;
+TE_t_aux  = TE_t                          ;
 
 % Test Mixer
 for tt=1:T

@@ -12,7 +12,7 @@ if any(strcmp(mpregime,{'FP' 'RP'}))
     r_vec=s_vec       ; % Initialize it
     r_vec(s_vec>0)=rs ;
     r_vec(s_vec<=0)=rs; % pin down value
-elseif strcmp(mpregime,{'BP'})
+elseif any(strcmp(mpregime,{'BP' 'MP'}))
     r_vec=s_vec       ; % Initialize it
     r_vec(s_vec>0)=rs ;
     r_vec(s_vec<=0)=rs+rsp_ss; % pin down value

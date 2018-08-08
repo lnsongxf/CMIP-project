@@ -12,6 +12,7 @@ f_ss=steady.f_ss; % Used only to draw a picture for the convergence
 
 % Update Borrowing Rate
 rb_t=rs_t;
+rsp_t = rb_t - rs_t;
 
 RT_t = zeros(1,T)          ;
 TE_t = RT_t                ;

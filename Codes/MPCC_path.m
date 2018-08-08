@@ -1,12 +1,13 @@
 %% MPCC_path
 % Update Income path
-cond   = 2*tol*10;
+cond   = 2*tol*1e2;
 Y_ss   = steady.Y_ss;
 y1_out = paths.mu_w_t(1,:)*eta_l+Y_ss*(1-eta_l)+RT_t;
 y2_out = paths.mu_w_t(2,:)*eta_l+Y_ss*(1-eta_l)+RT_t;
 y_out  = [y1_out; y2_out];
 
-while cond>tol*10
+while cond>tol*1e2
+    spreadea = rsp_t;
     % Update Income
     y=y_out;    
     
@@ -92,11 +93,31 @@ while cond>tol*10
         end
 
     end
-
+    
     %% Solving for the Distribution
     % Initializing Variables
     f=f_0;
+   
+    if flag_rss
+        c        = steady.c_ss;
+        V        = steady.V_ss;
+        rho_rss      = rho + chi_rss;
+        URF_rss      = @(x) URF(x) + chi_rss*V_t(:,1); 
 
+        MPCC_solve_cons_steady_rss;
+
+%         c_rss     = c     ;
+%         sigma_rss = sigma ;
+%         muF_rss   = muF   ;
+%         muB_rss   = muB   ;
+%         V_rss     = V     ;
+
+        [f_rss]   = KFE_ss_implicit(muF_rss,muB_rss,sigma_rss,s_vec,Ib,If);
+        f         = f_rss;          
+    end
+    
+    
+    
     % now solve forward to find the distribution  
     f_t = zeros(N,T);  
 
@@ -126,7 +147,7 @@ while cond>tol*10
     end
 
     %% Pre-Shock levels
-    f_t = [f_0 f_t(:,1:T-1)];
+    f_t = [f f_t(:,1:T-1)];
 
     % c_t = [steady.c_ss c_t(:,1:T-1)]; 
     % V_t(:,1) = steady.V_ss;
@@ -173,17 +194,21 @@ while cond>tol*10
             D_t(tt)=f_t(index_o:end,tt)'*s_vec(index_o:end)*ds;
 
             % Total Reseres --- assuming they are binding
-            M0_t(tt)=varrho*D_t(tt);
+            if strcmp(mpregime,'MP')
+                mub_t(tt) = M0_t(tt)/D_t(tt);                
+                rsp_t(tt) = interp1(mu_vec(mu_index),Dr(mu_index),mub_t(tt),'pchip');                
+            else
+                % Monetary Aggregates
+                M0_t(tt) = varrho*D_t(tt)    ;                            
+                M1_t(tt) = D_t(tt)           ;
+                MM_st(tt)= M1_t(tt)/M0_t(tt) ;
+            end
 
             if index_o>1
                 B_t(tt)=-f_t(1:index_o-1,tt)'*s_vec(1:index_o-1)*ds;
             else
                 B_t(tt)=0;
             end
-
-            % Monetary Aggregates
-            M1_t(tt) = D_t(tt)              ;
-            MM_st(tt) = M1_t(tt)/M0_t(tt)   ;
 
             % Asset savings condition
             Z_S(tt)=(D_t(tt)+TE_t(tt)-B_t(tt))./D_t(tt);
@@ -205,18 +230,33 @@ while cond>tol*10
             Z_Y(tt) = (Y_t(tt)-C_t(tt)-G_t(tt))./Y_t(tt);                      
     end
     
+    if strcmp(mpregime,'MP')
+        mub_t(T-30:T) = M0_ss/D_ss;
+        rsp_t(T-30:T) = rsp_ss;  
+        rb_t          = rs_t + rsp_t;   
+    end
+   
+    
     % Update income paths
     if any(strcmp(mpregime,{'FP' 'RP'}))
         y1_out=paths.mu_w_t(1,:)*eta_l + Y_t*(1-eta_l)+RT_t;
         y2_out=paths.mu_w_t(2,:)*eta_l + Y_ss*(1-eta_l)+RT_t;
-    elseif strcmp(mpregime,{'BP'})
+    elseif any(strcmp(mpregime,{'BP' 'MP'}))
         FT_t=rsp_t.*B_t;
         y1_out=paths.mu_w_t(1,:)*eta_l + Y_t*(1-eta_l)+RT_t+FT_t;
         y2_out=paths.mu_w_t(2,:)*eta_l + Y_t*(1-eta_l)+RT_t+FT_t;
     end
     
+    
     y_out=[y1_out; y2_out];
 
     % Find the optimality condition
-    cond=max(max(abs(y-y_out)./y));
+    cond1 = max(max(abs(y-y_out)./y));
+    cond2 = max(abs(rsp_t-spreadea));
+    cond  = mean([cond1 cond2]);
+     
 end
+
+Z_S = max(min(Z_S,1e10),-1e10);
+Z_Y = max(min(Z_Y,1e10),-1e10);
+

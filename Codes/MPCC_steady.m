@@ -42,7 +42,7 @@ while cond>tol
     end
     
     % Update income process
-    if strcmp(mpregime,'BP');
+    if any(strcmp(mpregime,{'BP' 'MP'}));
         RT_ss=rs*(Ef_ss*D_ss);
         FT_ss=rsp_ss*B_ss;
         y1_out=w1*eta_l + Y_ss*(1-eta_l) + RT_ss + FT_ss;
@@ -55,7 +55,7 @@ while cond>tol
         y2_out=w2*eta_l + Y_ss*(1-eta_l)+RT_ss;
         y_out=[y1_out; y2_out];
         cond=max(abs(y-y_out)./y);
-    elseif strcmp(mpregime,'FP');
+    elseif strcmp(mpregime,{'FP'});
         RT_ss=0 ;
         y1_out=w1*eta_l + Y_ss*(1-eta_l) + RT_ss ;
         y2_out=w2*eta_l + Y_ss*(1-eta_l) + RT_ss  ;
@@ -68,8 +68,8 @@ end
 
 % Construct Clearing residuals
 Z_Y_ss=(Y_ss-C_ss)/Y_ss;
-if strcmp(mpregime,'FP');
+if any(strcmp(mpregime,{'FP'}));
     Z_S_ss=(B_ss-D_ss)/D_ss; % pin down value
-elseif any(strcmp(mpregime,{'RP' 'BP'}));
+elseif any(strcmp(mpregime,{'RP' 'BP'  'MP'}));
     Z_S_ss=((1+Ef_ss)*D_ss-B_ss)/D_ss; % Market clearing condition        
 end

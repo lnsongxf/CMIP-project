@@ -34,7 +34,7 @@ MB_ss1= mu_ss_target*D_ss          ;
 MB_t  = MB_ss1*ones(T+1,1)         ;  % constant along transition
 ND_t  = D_t                        ;
 mub_t = mu_ss_target*ones(T+1,1)   ;
-mu_t = mu_ss_target*ones(T+1,1)    ;
+mu_t  = mu_ss_target*ones(T+1,1)   ;
 P_t   = ones(T+1,1)                ;
 dP_t  = inf_target*ones(T+1,1)     ;
 id_t  = i_target*ones(T+1,1)       ; 
@@ -74,16 +74,17 @@ end
 index_1=(2:T+1);
 
 figure(cc);
-plot(index_1-2,M0_t(index_1-1),'LineWidth',4,'color',color1_ss); hold on;
-plot(index_1-2,MB_t(index_1-1),'--o','LineWidth',4,'color',color1_shock); grid on;
-[yout]=get(gca,'ylim');
+plot(index_1-2,M0_t(index_1-1)-M0_t(1),'LineWidth',4,'color',color1_ss); hold on;
+plot(index_1-2,MB_t(index_1-1)-MB_t(1),'--o','LineWidth',4,'color',color1_shock); grid on;
+xlim([0 t_plotmax]);
+[yout]=get(gca,'ylim'); 
 line([T_pre T_pre],[yout(1) yout(2)],'Color','k','LineWidth',1,'LineStyle','-');
 line([T_post-1 T_post-1],[yout(1) yout(2)],'Color','k','LineWidth',1,'LineStyle','-');
 h=patch([T_pre T_post-1 T_post-1 T_pre],[yout(1) yout(1) yout(2) yout(2)],[0.9 0.9 0.9]); alpha(h,0.2);
 % otitle('Cash Holdings');
 label_x('time');
 legend('Currency','Reserves'); formatlegend('Best');axis tight;
-formataxis(gca);  xlim([0 t_plotmax]);
+formataxis(gca);  
 if printit==1
     imprime(['fig' nameplot num2str(cc)]);
     imprpdf(['fig' nameplot num2str(cc)]);
@@ -110,15 +111,15 @@ plot(index_1-2,dP_t(index_1-1)*100,'LineStyle',':','LineWidth',4,'color',[.1 .1 
 plot(index_1-2,id_t(index_1-1)*100,'color',[220 85 0]/255,'LineStyle','-','LineWidth',4); 
 plot(index_1-2,rs_t(index_1-1)*100,'color',[255 195 0]/255,'LineWidth',4);
 plot(index_1-2,inf_target*100+0*rs_t(index_1-1),'k-.','LineWidth',2); grid on;
-
+ylim([-1 2])
 [yout]=get(gca,'ylim');
 line([T_pre T_pre],[yout(1) yout(2)],'Color','k','LineWidth',1,'LineStyle','-');
 line([T_post-1 T_post-1],[yout(1) yout(2)],'Color','k','LineWidth',1,'LineStyle','-');
 h=patch([T_pre T_post-1 T_post-1 T_pre],[yout(1) yout(1) yout(2) yout(2)],[0.9 0.9 0.9]); alpha(h,0.2);
 % otitle('Fisher Equation Decomp.');
-legend('Inflation','Nominal Rate','Real Rate','Inflation Target'); axis tight;
+legend('Inflation','Nominal Rate','Real Rate','Inflation Target'); 
 label_x('time'); label_y('$\%$');
-formataxis(gca); axis tight; xlim([0 t_plotmax]);
+formataxis(gca); xlim([0 t_plotmax]);
 
 formatlegend('northeast');
 if printit==1
