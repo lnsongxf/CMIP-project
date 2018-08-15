@@ -16,6 +16,7 @@ TE_ss= steady.TE_ss ;
 
 % Update Borrowing Rate
 rb_t=rs_t;
+rsp_t = rb_t - rs_t;
 
 % Backout Transfer set
 T_t=paths.T_t                          ;
